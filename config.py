@@ -5,6 +5,8 @@ load_dotenv()
 
 # Bot configuration
 BOT_TOKEN = os.getenv("BOT_TOKEN", "8507784193:AAEj2tMBQniB9wJ5cjOY-Sq6bKLZs-PLEy4")
+API_ID = os.getenv("API_ID")
+API_HASH = os.getenv("API_HASH")
 
 # Paths
 DOWNLOAD_DIR = "downloads"

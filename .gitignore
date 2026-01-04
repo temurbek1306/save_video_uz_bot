@@ -9,3 +9,4 @@ final_test.py
 test_log.txt
 database.db
 鼓
+*.session

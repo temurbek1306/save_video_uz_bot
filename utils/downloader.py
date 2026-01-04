@@ -15,7 +15,7 @@ async def download_media(url):
     ydl_opts = {
         # Strategiya: 
         # FAQAT bitta fayldan iborat formatlarni tanlash (ffmpeg birlashtirishni talab qilmasligi uchun)
-        'format': 'best[ext=mp4][filesize<50M]/best[ext=mp4][height<=480]/best[ext=mp4][height<=360]/best[ext=mp4]/best',
+        'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
         'outtmpl': output_template,
         'noplaylist': True,
         'quiet': True,
@@ -42,7 +42,7 @@ async def download_media(url):
                 # Some sites might change the extension, try to find it
                 base_path = os.path.splitext(actual_filename)[0]
                 found = False
-                for ext_candidate in ['mp4', 'mkv', 'webm', 'm4a', 'mp3']:
+                for ext_candidate in ['mp4', 'mkv', 'webm', 'm4a', 'mp3', 'jpg', 'jpeg', 'png', 'webp']:
                     test_path = f"{base_path}.{ext_candidate}"
                     if os.path.exists(test_path) and os.path.getsize(test_path) > 0:
                         actual_filename = test_path
