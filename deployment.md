@@ -1,29 +1,30 @@
-# Render.com orqali deploy qilish (Qadamba-qadam)
+# Pella.app orqali 100% Bepul deploy qilish
 
-Render'da botingizni 24/7 ishlatish uchun quyidagi qadamlarni bajaring:
+Render pullik bo'lgani uchun, O'zbekistonda botlar uchun juda mashhur va bepul bo'lgan **Pella.app** platformasidan foydalanamiz.
 
-### 1. GitHub'ga yuklash
-Kodingizni GitHub-da yangi (private bo'lishi tavsiya etiladi) repozitoriyaga yuklang.
+### 1. Botni tayyorlash
+Loyiha ichida `Procfile` va `runtime.txt` fayllari allaqachon bor, buni o'zgartirish shart emas.
 
-### 2. Render-da yangi xizmat ochish
-1. [Render Dashboard](https://dashboard.render.com/)-ga kiring.
-2. **New +** tugmasini bosing va **Background Worker**-ni tanlang.
-3. GitHub repozitoriyangizni ulang.
+### 2. Pella.app-da ro'yxatdan o'tish
+1. [Pella.app](https://pella.app) saytiga kiring.
+2. Ro'yxatdan o'ting (Discord orqali kirish qulayroq bo'lishi mumkin).
 
-### 3. Sozlamalar
-- **Name**: `save-video-uz-bot`
-- **Region**: O'zingizga yaqinini tanlang (masalan, Frankfurt).
-- **Runtime**: `Python 3`
+### 3. Botni yaratish
+1. "Create New" tugmasini bosing.
+2. Loyiha turini **Telegram Bot** yoki **Python** deb tanlang.
+3. GitHub repozitoriyangizni (https://github.com/temurbek1306/save_video_uz_bot.git) ulang.
+
+### 4. Sozlamalar
 - **Build Command**: `pip install -r requirements.txt`
 - **Start Command**: `python main.py`
+- **Environment Variables**:
+  - `BOT_TOKEN`: `8507784193:AAEj2tMBQniB9wJ5cjOY-Sq6bKLZs-PLEy4`
 
-### 4. Muhit o'zgaruvchilari (Environment Variables)
-"Advanced" tugmasini bosing va quyidagilarni qo'shing:
-- `BOT_TOKEN`: `8507784193:AAEj2tMBQniB9wJ5cjOY-Sq6bKLZs-PLEy4`
+### 5. Afzalliklari
+- **100% Bepul**: Karta talab qilinmaydi.
+- **24/7 ishlaydi**: Bot doimiy faol bo'ladi.
+- **Oson boshqaruv**: GitHub-ga kod yuborsangiz, bot avtomat yangilanadi.
 
-### 5. Muhim eslatma
-Render-ning bepul versiyasida `ffmpeg` o'rnatilmagan bo'lishi mumkin. Lekin biz botni `ffmpeg`siz ham ishlaydigan qilib sozlanganmiz, shuning uchun muammo bo'lmaydi.
-
-### 6. Video yuklash limiti
-Render-ning bepul versiyasida disk xotirasi vaqtinchalik bo'ladi. Bot fayllarni yuklab bo'lgach o'chirib yuboradi, bu bepul xosting uchun juda mos.
+### 6. FPS.ms (Muqobil)
+Agar Pella bilan muammo bo'lsa, **FPS.ms** sayti ham xuddi shunday bepul xizmat ko'rsatadi. U yerda ham GitHub-ni ulash kifoya.
 鼓

@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+downloads/*
+!downloads/.gitkeep
+.env
+debug_*.py
+test_*.py
+final_test.py
+test_log.txt
+database.db
+鼓
