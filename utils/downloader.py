@@ -13,8 +13,7 @@ async def download_media(url):
     output_template = os.path.join(DOWNLOAD_DIR, f"{file_id}.%(ext)s")
     
     ydl_opts = {
-        # Strategiya: 
-        # FAQAT bitta fayldan iborat formatlarni tanlash (ffmpeg birlashtirishni talab qilmasligi uchun)
+        # Try to get best video + best audio, but fallback to single file formats if FFmpeg is missing
         'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
         'outtmpl': output_template,
         'noplaylist': True,
@@ -30,7 +29,17 @@ async def download_media(url):
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(url, download=True)
+            try:
+                info = ydl.extract_info(url, download=True)
+            except Exception as e:
+                # If FFmpeg is missing, yt-dlp might fail to merge. Try fallback to single file.
+                if "ffmpeg" in str(e).lower() or "merge" in str(e).lower():
+                    ydl_opts['format'] = 'best[ext=mp4]/best'
+                    with yt_dlp.YoutubeDL(ydl_opts) as ydl_fallback:
+                        info = ydl_fallback.extract_info(url, download=True)
+                else:
+                    raise e
+
             # Find the actual downloaded file
             filename = ydl.prepare_filename(info)
             
@@ -65,6 +74,7 @@ async def download_media(url):
             }
     except Exception as e:
         return {"success": False, "error": f"Yuklashda xatolik: {str(e)}"}
+
 
 async def search_music(query):
     """
