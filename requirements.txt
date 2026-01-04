@@ -1,6 +1,3 @@
 python-telegram-bot
 yt-dlp
-shazamio
-aiohttp
 python-dotenv
-pytest
