@@ -46,11 +46,21 @@ async def download_media(url):
             'sec-ch-ua-platform': '"Windows"',
         })
         # Use Instagram extractor arguments for better compatibility
-        ydl_opts['extractor_args'] = {
-            'instagram': {
-                'api_version': 'v1'
-            }
-        }
+        # Use Instagram extractor arguments for better compatibility
+        # Removed api_version as it might be causing issues, letting yt-dlp decide
+        ydl_opts['extractor_args'] = {}
+        
+        # Update user agent and headers for Instagram (Mobile)
+        ydl_opts['user_agent'] = 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Mobile Safari/537.36'
+        ydl_opts['http_headers'].update({
+             'Sec-Fetch-Dest': 'document',
+             'Sec-Fetch-Mode': 'navigate',
+             'Sec-Fetch-Site': 'none',
+             'Sec-Fetch-User': '?1',
+             'sec-ch-ua': '"Google Chrome";v="123", "Not:A-Brand";v="8", "Chromium";v="123"',
+             'sec-ch-ua-mobile': '?1',
+             'sec-ch-ua-platform': '"Android"',
+        })
         # For Instagram, accept both video and image formats
         ydl_opts['format'] = 'best'
         # Download all items in carousel posts (multiple photos/videos)
@@ -163,21 +173,15 @@ async def search_music(query):
     output_template = os.path.join(DOWNLOAD_DIR, f"{file_id}.%(ext)s")
     
     ydl_opts = {
-        # Specifically pick a single audio file format to avoid merging
-        'format': 'bestaudio[ext=m4a]/bestaudio/best',
+        # Strictly audio
+        'format': 'bestaudio',
         'outtmpl': output_template,
         'noplaylist': True,
         'quiet': True,
         'no_warnings': True,
         'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         'referer': 'https://www.google.com/',
-        # Add YouTube extractor args to fix player response errors
-        'extractor_args': {
-            'youtube': {
-                'player_client': ['ios', 'android', 'web'],
-                'player_skip': ['webpage', 'js', 'configs'],
-            }
-        }
+        # Removed extractor_args to see if it fixes "format not available"
     }
 
     try:
