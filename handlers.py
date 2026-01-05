@@ -121,6 +121,9 @@ async def process_download_result(message, status_msg, result):
                 logger.info(f"File size {file_size:.2f}MB > 50MB. Using Pyrogram for upload...")
                 await status_msg.edit_text(f"Katta fayl yuklanmoqda... ({file_size:.1f}MB) 📤")
                 
+                # Define caption before using it
+                caption = f"✅ Yuklandi: {result['title']}\n\n@save_video_uz_bot"
+                
                 try:
                     if not pg_app.is_connected:
                         await pg_app.start()

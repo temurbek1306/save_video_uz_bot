@@ -12,6 +12,9 @@ async def download_media(url):
     # Note: we use a generic template and fix extension after download
     output_template = os.path.join(DOWNLOAD_DIR, f"{file_id}.%(ext)s")
     
+    # Check if URL is from Instagram
+    is_instagram = any(pattern in url for pattern in ['instagram.com', 'instagr.am'])
+    
     ydl_opts = {
         # Try to get best video + best audio, but fallback to single file formats if FFmpeg is missing
         'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
@@ -19,13 +22,35 @@ async def download_media(url):
         'noplaylist': True,
         'quiet': True,
         'no_warnings': True,
-        'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'referer': 'https://www.google.com/',
+        'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+        'referer': 'https://www.instagram.com/' if is_instagram else 'https://www.google.com/',
         'http_headers': {
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
             'Accept-Language': 'en-US,en;q=0.9',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'DNT': '1',
+            'Connection': 'keep-alive',
+            'Upgrade-Insecure-Requests': '1',
         }
     }
+    
+    # Instagram-specific options
+    if is_instagram:
+        ydl_opts['http_headers'].update({
+            'Sec-Fetch-Dest': 'document',
+            'Sec-Fetch-Mode': 'navigate',
+            'Sec-Fetch-Site': 'none',
+            'Sec-Fetch-User': '?1',
+            'sec-ch-ua': '"Google Chrome";v="131", "Chromium";v="131", "Not_A Brand";v="24"',
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': '"Windows"',
+        })
+        # Use Instagram extractor arguments for better compatibility
+        ydl_opts['extractor_args'] = {
+            'instagram': {
+                'api_version': 'v1'
+            }
+        }
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
