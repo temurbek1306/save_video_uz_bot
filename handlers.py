@@ -103,6 +103,62 @@ async def process_download_result(message, status_msg, result):
     """Sends the downloaded file to the user."""
     if result["success"]:
         try:
+            # Handle Instagram carousel (multiple files)
+            if result.get("is_carousel", False):
+                files = result.get("files", [])
+                if not files:
+                    await status_msg.edit_text("❌ Carousel fayllarini yuborib bo'lmadi.")
+                    return
+                
+                caption = f"✅ Yuklandi: {result['title']}\n\n@save_video_uz_bot"
+                
+                # Send as media group if multiple files
+                if len(files) > 1:
+                    from telegram import InputMediaPhoto, InputMediaVideo
+                    media_group = []
+                    
+                    for idx, file_info in enumerate(files[:10]):  # Telegram limit: 10 items per media group
+                        file_path = file_info["file_path"]
+                        ext = file_info["ext"]
+                        
+                        with open(file_path, 'rb') as f:
+                            if ext in ["jpg", "jpeg", "png", "webp"]:
+                                media_group.append(InputMediaPhoto(
+                                    media=f.read(),
+                                    caption=caption if idx == 0 else None
+                                ))
+                            else:
+                                media_group.append(InputMediaVideo(
+                                    media=f.read(),
+                                    caption=caption if idx == 0 else None
+                                ))
+                    
+                    await message.reply_media_group(media=media_group)
+                    
+                    # Cleanup all files
+                    for file_info in files:
+                        cleanup_file(file_info["file_path"])
+                else:
+                    # Single file from carousel
+                    file_info = files[0]
+                    file_path = file_info["file_path"]
+                    ext = file_info["ext"]
+                    
+                    with open(file_path, 'rb') as f:
+                        if ext in ["jpg", "jpeg", "png", "webp"]:
+                            await message.reply_photo(photo=f, caption=caption)
+                        else:
+                            await message.reply_video(video=f, caption=caption)
+                    
+                    cleanup_file(file_path)
+                
+                try:
+                    await status_msg.delete()
+                except:
+                    pass
+                return
+            
+            # Handle single file (original logic)
             file_path = result["file_path"]
             file_size = os.path.getsize(file_path) / (1024 * 1024)
             logger.info(f"Processing file: {file_path} ({file_size:.2f}MB)")

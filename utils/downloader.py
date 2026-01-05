@@ -51,6 +51,10 @@ async def download_media(url):
                 'api_version': 'v1'
             }
         }
+        # For Instagram, accept both video and image formats
+        ydl_opts['format'] = 'best'
+        # Download all items in carousel posts (multiple photos/videos)
+        ydl_opts['noplaylist'] = False
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -65,10 +69,43 @@ async def download_media(url):
                 else:
                     raise e
 
-            # Find the actual downloaded file
-            filename = ydl.prepare_filename(info)
+            # Check if this is a carousel/playlist (multiple items)
+            if 'entries' in info and info['entries']:
+                # Instagram carousel with multiple photos/videos
+                files = []
+                for entry in info['entries']:
+                    if entry:
+                        filename = ydl.prepare_filename(entry)
+                        actual_filename = filename
+                        
+                        # Check if file exists
+                        if not os.path.exists(actual_filename) or os.path.getsize(actual_filename) == 0:
+                            base_path = os.path.splitext(actual_filename)[0]
+                            for ext_candidate in ['mp4', 'mkv', 'webm', 'm4a', 'mp3', 'jpg', 'jpeg', 'png', 'webp']:
+                                test_path = f"{base_path}.{ext_candidate}"
+                                if os.path.exists(test_path) and os.path.getsize(test_path) > 0:
+                                    actual_filename = test_path
+                                    break
+                        
+                        if os.path.exists(actual_filename):
+                            files.append({
+                                "file_path": actual_filename,
+                                "ext": entry.get("ext", "jpg"),
+                                "title": entry.get("title", "No Title")
+                            })
+                
+                if files:
+                    return {
+                        "success": True,
+                        "is_carousel": True,
+                        "files": files,
+                        "title": info.get("title", "Instagram Post"),
+                    }
+                else:
+                    return {"success": False, "error": "Carousel fayllarini yuklab bo'lmadi."}
             
-            # Sometimes extension changes during download, let's verify
+            # Single file (not a carousel)
+            filename = ydl.prepare_filename(info)
             actual_filename = filename
             
             # Check if file exists and is not empty
@@ -91,6 +128,7 @@ async def download_media(url):
             # YouTube often returns 'm4a' or 'webm' for audio, or 'mp4' for best video
             return {
                 "success": True,
+                "is_carousel": False,
                 "file_path": actual_filename,
                 "title": info.get("title", "No Title"),
                 "ext": ext,
