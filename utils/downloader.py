@@ -55,6 +55,21 @@ async def download_media(url):
         ydl_opts['format'] = 'best'
         # Download all items in carousel posts (multiple photos/videos)
         ydl_opts['noplaylist'] = False
+    
+    # Check if URL is from YouTube
+    is_youtube = any(pattern in url for pattern in ['youtube.com', 'youtu.be'])
+    
+    # YouTube-specific options to fix player response extraction errors
+    if is_youtube:
+        ydl_opts['extractor_args'] = {
+            'youtube': {
+                'player_client': ['android', 'web'],
+                'player_skip': ['webpage', 'configs'],
+                'skip': ['hls', 'dash']
+            }
+        }
+        # Use cookies from browser if available (helps with age-restricted content)
+        # ydl_opts['cookiesfrombrowser'] = ('chrome',)  # Uncomment if needed
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -155,6 +170,14 @@ async def search_music(query):
         'no_warnings': True,
         'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         'referer': 'https://www.google.com/',
+        # Add YouTube extractor args to fix player response errors
+        'extractor_args': {
+            'youtube': {
+                'player_client': ['android', 'web'],
+                'player_skip': ['webpage', 'configs'],
+                'skip': ['hls', 'dash']
+            }
+        }
     }
 
     try:
