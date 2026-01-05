@@ -61,15 +61,16 @@ async def download_media(url):
     
     # YouTube-specific options to fix player response extraction errors
     if is_youtube:
+        # Use more aggressive extraction methods
         ydl_opts['extractor_args'] = {
             'youtube': {
-                'player_client': ['android', 'web'],
-                'player_skip': ['webpage', 'configs'],
-                'skip': ['hls', 'dash']
+                'player_client': ['ios', 'android', 'web'],
+                'player_skip': ['webpage', 'js', 'configs'],
             }
         }
-        # Use cookies from browser if available (helps with age-restricted content)
-        # ydl_opts['cookiesfrombrowser'] = ('chrome',)  # Uncomment if needed
+        # Additional options to help with extraction
+        ydl_opts['format'] = 'best[ext=mp4]/best'
+        ydl_opts['http_headers']['Accept-Language'] = 'en-US,en;q=0.9'
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -173,9 +174,8 @@ async def search_music(query):
         # Add YouTube extractor args to fix player response errors
         'extractor_args': {
             'youtube': {
-                'player_client': ['android', 'web'],
-                'player_skip': ['webpage', 'configs'],
-                'skip': ['hls', 'dash']
+                'player_client': ['ios', 'android', 'web'],
+                'player_skip': ['webpage', 'js', 'configs'],
             }
         }
     }
