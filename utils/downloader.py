@@ -69,18 +69,18 @@ async def download_media(url):
     # Check if URL is from YouTube
     is_youtube = any(pattern in url for pattern in ['youtube.com', 'youtu.be'])
     
-    # YouTube-specific options to fix player response extraction errors
+    # YouTube-specific options
     if is_youtube:
-        # Use more aggressive extraction methods
-        ydl_opts['extractor_args'] = {
-            'youtube': {
-                'player_client': ['ios', 'android', 'web'],
-                'player_skip': ['webpage', 'js', 'configs'],
-            }
-        }
+        # Use defaults for YouTube as they are more reliable than custom headers/UA
+        ydl_opts.pop('user_agent', None)
+        ydl_opts.pop('http_headers', None)
+        
+        # We need to set at least simple options if headers are popped
+        # Actually letting yt-dlp handle it is best.
+        
         # Additional options to help with extraction
         ydl_opts['format'] = 'best[ext=mp4]/best'
-        ydl_opts['http_headers']['Accept-Language'] = 'en-US,en;q=0.9'
+        # Re-adding minimal headers if needed? No, CLI works without them.
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
